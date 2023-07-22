@@ -1,0 +1,42 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install updates (Debian)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Debian"
+
+  - name: install few utilities
+    tags: utilities
+    apt:
+      name:
+        - htop
+        - ca-certificates
+        - curl
+        - gnupg
+      state: latest
+
+  # install docker
+  - name: add docker GPG apt key
+    apt_key:
+      url: https://download.docker.com/linux/debian/gpg
+      state: present
+
+  - name: add docker repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/debian bookworm stable
+      state: present
+
+  - name: update apt and install docker-ce
+    tags: docker
+    apt:
+      name: docker-ce
+      state: latest
+      update_cache: true
+
+  

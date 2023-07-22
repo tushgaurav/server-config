@@ -1,0 +1,60 @@
+---
+
+- hosts: all
+  become: true
+  vars:
+    portainer: portainer/portainer-ce
+    uptime_kuma: louislam/uptime-kuma
+    nextcloud: nextcloud
+
+
+  tasks:
+    - name: pull portainer docker image
+      community.docker.docker_image:
+        name: "{{ portainer }}"
+        source: pull
+
+    - name: pull uptime_kuma docker image
+      community.docker.docker_image:
+        name: "{{ uptime_kuma }}"
+        source: pull
+
+    - name: pull nextcloud docker image
+      community.docker.docker_image:
+        name: "{{ nextcloud }}"
+        source: pull
+
+    - name: create uptime-kuma container
+      community.docker.docker_container:
+        name: uptimekuma
+        image: "{{ uptime_kuma }}"
+        volumes: 
+          - /uptime-kuma:/app/data
+        published_ports: 
+          - 8080:3001
+        state: present
+
+    - name: create portainer container
+      community.docker.docker_container:
+        name: portainer
+        image: "{{ portainer }}"
+        restart_policy: always
+        recreate: yes
+        volumes: 
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_data:/data
+        published_ports: 
+          - 8000:8000
+          - 9443:9443
+          - 9000:9000
+        state: started
+
+    - name: create nextcloud container
+      community.docker.docker_container:
+        name: nextcloud
+        image: "{{ nextcloud }}"
+        restart_policy: always
+        published_ports:
+          - 443:80
+        volumes:
+          - nextcloud:/var/www/html
