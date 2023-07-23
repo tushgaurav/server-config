@@ -5,7 +5,7 @@
 1. Install Ansible on your host controller system.
 2. Update the inventory file with server IP addresses/FQDNs.
 3. Ensure servers are reachable via SSH from the host.
-4. Run playbooks using: `ansible-playbook your_playbook.yml -i inventory`.
+4. Run playbooks using: `ansible-playbook your_playbook.yml`.
 
 ## Playbooks and Functionalities
 
